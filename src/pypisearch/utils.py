@@ -18,3 +18,30 @@ def get_memory_uss(pid: int | None = None):
         return int(psutil.Process(pid).memory_full_info().uss)
     except psutil.NoSuchProcess:
         return -1
+
+
+def get_smaps_summary(pid: int | None = None):
+    heap = 0
+    anon = 0
+    total = 0
+    current_region = None
+
+    if pid is None:
+        pid = psutil.Process(pid).pid
+
+    with open(f"/proc/{pid}/smaps", "r") as f:
+        for line in f:
+            if line.startswith("Size:"):
+                size = int(line.split()[1])
+                total += size
+            elif line.startswith("Anonymous:"):
+                anon += int(line.split()[1])
+            elif "[heap]" in line:
+                current_region = "heap"
+            elif line.strip() == "":
+                current_region = None
+
+            if current_region == "heap" and line.startswith("Size:"):
+                heap += int(line.split()[1])
+
+    return {"heap_kb": heap, "anonymous_mmaps_kb": anon, "total_mapped_kb": total}

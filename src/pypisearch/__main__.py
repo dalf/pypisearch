@@ -4,9 +4,9 @@ import aiohttp
 import click
 import uvloop
 
-from .dataset import download_dataset, get_dataset
+from .index import download_index, get_index
 from .metrics import StopWatch
-from .utils import get_memory_uss
+from .utils import get_memory_uss, get_smaps_summary
 
 uvloop.install()
 
@@ -39,21 +39,28 @@ async def fetch_all(package_name_list: list[str]) -> dict[str, dict]:
     return results
 
 
-async def async_search(query: str):
-    norm_query = query.lower()
+def index_search(query: str) -> list[str]:
+    index = get_index()
+    searcher = index.searcher()
+    query = index.parse_query(
+        query,
+        [
+            "title",
+        ],
+    )
+    result = searcher.search(query, 15).hits
+    return [searcher.doc(r[1])["title"][0] for r in result]
 
-    package_name_list = list(get_dataset().search_re(norm_query + ".*"))
-    if not package_name_list:
-        package_name_list = list(get_dataset().search(norm_query, 2))
-    if not package_name_list:
-        package_name_list = list(get_dataset().search_re(".*" + norm_query + ".*"))
+
+async def async_search(query: str):
+    package_name_list = index_search(query)
     details = await fetch_all(package_name_list)
     for package_name, detail in details.items():
         print(detail.get("info", {}).get("name", package_name))
         if "info" in detail:
-            print("    summary:", detail["info"]["summary"])
-            print("    version:", detail["info"]["version"])
-            print("project_url:", detail["info"]["project_url"])
+            print("    summary     : ", detail["info"]["summary"])
+            print("    version     : ", detail["info"]["version"])
+            print("    project_url : ", detail["info"]["project_url"])
 
 
 @click.group()
@@ -64,25 +71,29 @@ def cli():
 
 @cli.command()
 def download():
-    asyncio.run(download_dataset())
+    asyncio.run(download_index())
 
 
 @cli.command()
 @click.argument("text", type=str)
 def search(text: str):
     sw = StopWatch()
+    memory_before_detail = get_smaps_summary()
+    memory_before = get_memory_uss()
     with sw.measure("load"):
-        memory_before = get_memory_uss()
-        get_dataset()
-        memory_after = get_memory_uss()
+        get_index()
 
     with sw.measure("query"):
         asyncio.run(async_search(text))
+    memory_after = get_memory_uss()
+    memory_after_detail = get_smaps_summary()
 
     print("--------------------")
     print("cputime=", sw.get_cputime_dict())
     print("runtime=", sw.get_runtime_dict())
-    print("memory usage for dataset =", memory_after - memory_before, "bytes")
+    print("memory usage for loading the index =", memory_after - memory_before, "bytes")
+    memdiff = {k: v - memory_before_detail[k] for k, v in memory_after_detail.items()}
+    print("memory diff=", memdiff)
 
 
 if __name__ == "__main__":
