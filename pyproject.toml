@@ -1,0 +1,42 @@
+[project]
+name = "pypisearch"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Alexandre Flament", email = "alexandre.flament@hesge.ch" }
+]
+dependencies = [
+    "aiohttp[speedups]>=3.11.16",
+    "lxml>=5.3.2",
+    "rust-fst>=0.1.2",
+    "uvloop>=0.21.0",
+    "click>=8.1.8",
+    "psutil>=7.0.0",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pypisearch"]
+
+[tool.black]
+line-length = 240
+
+[tool.ruff]
+line-length = 240
+
+[tool.ruff.lint]
+# see https://github.com/charliermarsh/ruff#supported-rules
+select = ["F", "E", "W", "I001", "C4", "RET", "SIM", "PLC", "PLE", "PLW", "RUF100"]
+ignore = ["E722", "E501", "E402", "W291", "W293", "I001", "PLW0603"]
