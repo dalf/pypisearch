@@ -51,8 +51,9 @@ async def async_search(query: str):
     for package_name, detail in details.items():
         print(detail.get("info", {}).get("name", package_name))
         if "info" in detail:
-            print("   summary:", detail["info"]["summary"])
-            print("   version:", detail["info"]["version"])
+            print("    summary:", detail["info"]["summary"])
+            print("    version:", detail["info"]["version"])
+            print("project_url:", detail["info"]["project_url"])
 
 
 @click.group()
