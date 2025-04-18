@@ -21,10 +21,22 @@ fasttext
     summary: fasttext Python bindings
     version: 0.9.3
 project_url: https://pypi.org/project/fasttext/
-fasttext-github
-    summary: fastText Python bindings
-    version: 0.8.22
-project_url: https://pypi.org/project/fasttext-github/
+fasttext-serving
+    summary: fasttext-serving gRPC client
+    version: 0.2.0
+project_url: https://pypi.org/project/fasttext-serving/
+fasttext-serving-protos
+    summary: FastText Serving Protocol Bufers Python implementation
+    version: 0.0.13
+project_url: https://pypi.org/project/fasttext-serving-protos/
+fasttext-serving-server
+    summary: fastText model serving API server
+    version: 0.6.2
+project_url: https://pypi.org/project/fasttext-serving-server/
+fasttext-server
+    summary: Deploy fasttext models
+    version: 0.1.10
+project_url: https://pypi.org/project/fasttext-server/
 fasttext-langdetect
     summary: 80x faster and 95% accurate language identification with Fasttext
     version: 1.0.5
@@ -53,26 +65,6 @@ fasttext-predict
     summary: fasttext with wheels and no external dependency, but only the predict method (<1MB)
     version: 0.9.2.4
 project_url: https://pypi.org/project/fasttext-predict/
-fasttext-reducer
-    summary: Lightweight package that allows for downloading fasttext models to any location and reducing their dimensions through a one-liner.
-    version: 0.1.3
-project_url: https://pypi.org/project/fasttext-reducer/
-fasttext-server
-    summary: Deploy fasttext models
-    version: 0.1.10
-project_url: https://pypi.org/project/fasttext-server/
-fasttext-serving
-    summary: fasttext-serving gRPC client
-    version: 0.2.0
-project_url: https://pypi.org/project/fasttext-serving/
-fasttext-serving-protos
-    summary: FastText Serving Protocol Bufers Python implementation
-    version: 0.0.13
-project_url: https://pypi.org/project/fasttext-serving-protos/
-fasttext-serving-server
-    summary: fastText model serving API server
-    version: 0.6.2
-project_url: https://pypi.org/project/fasttext-serving-server/
 fasttext-wheel
     summary: fasttext Python bindings
     version: 0.9.2
@@ -81,10 +73,14 @@ fasttext-win
     summary: A Python interface for Facebook fastText library
     version: 0.8.3
 project_url: https://pypi.org/project/fasttext-win/
-FastText_Shop
-    summary: FastText_Shop是一个基于FastText和结巴分词的短文本分类工具，特点是高效易用，同时支持中文和英文语料。基本使用方法、灵感来自TextGrocery,并且和TextGrocery基本相同。
-    version: 0.0.8
-project_url: https://pypi.org/project/FastText_Shop/
+fasttext-github
+    summary: fastText Python bindings
+    version: 0.8.22
+project_url: https://pypi.org/project/fasttext-github/
+fasttext-reducer
+    summary: Lightweight package that allows for downloading fasttext models to any location and reducing their dimensions through a one-liner.
+    version: 0.1.3
+project_url: https://pypi.org/project/fasttext-reducer/
 fasttextannotator
     summary: A python package that allows the user to annotate corpuses for FastText
     version: 1.0.0
@@ -93,15 +89,19 @@ fasttextaug
     summary: None
     version: 0.1.1
 project_url: https://pypi.org/project/fasttextaug/
-fasttextmirror
-    summary: fastText Python bindings
-    version: 0.8.22
-project_url: https://pypi.org/project/fasttextmirror/
 FastTextProcessor
     summary: A tool for processing text data in various formats
     version: 2.0.0
 project_url: https://pypi.org/project/FastTextProcessor/
 fasttextpy
+FastText_Shop
+    summary: FastText_Shop是一个基于FastText和结巴分词的短文本分类工具，特点是高效易用，同时支持中文和英文语料。基本使用方法、灵感来自TextGrocery,并且和TextGrocery基本相同。
+    version: 0.0.8
+project_url: https://pypi.org/project/FastText_Shop/
+fasttextmirror
+    summary: fastText Python bindings
+    version: 0.8.22
+project_url: https://pypi.org/project/fasttextmirror/
 FastTextRank
     summary: Extract abstracts and keywords from Chinese text
     version: 1.4
@@ -111,7 +111,7 @@ fasttextsearch
     version: 0.12
 project_url: https://pypi.org/project/fasttextsearch/
 --------------------
-Load   (<TimeMeasure runtime=0.0002 cputime=0.0002 count=   1>, <MemoryMeasure USS=   804 KB, heap=  5064 KB, anonymous_mmaps=     4 KB, total_mapped=  5064 KB, count=  1>)
-Query  (<TimeMeasure runtime=0.0009 cputime=0.0009 count=   1>, <MemoryMeasure USS=  2624 KB, heap=   148 KB, anonymous_mmaps=   256 KB, total_mapped=   148 KB, count=  1>)
-Search (<TimeMeasure runtime=0.2799 cputime=0.0680 count=   1>, <MemoryMeasure USS=  9588 KB, heap=307032 KB, anonymous_mmaps=  5708 KB, total_mapped=307032 KB, count=  1>)
+Load   (<TimeMeasure runtime=0.0001 cputime=0.0001 count=   1>, <MemoryMeasure USS=   984 KB, heap=  2652 KB, anonymous_mmaps=     0 KB, total_mapped=  2652 KB, count=  1>)
+Query  (<TimeMeasure runtime=0.0001 cputime=0.0001 count=   1>, <MemoryMeasure USS=  1152 KB, heap=     0 KB, anonymous_mmaps=     0 KB, total_mapped=     0 KB, count=  1>)
+Search (<TimeMeasure runtime=0.1984 cputime=0.0709 count=   1>, <MemoryMeasure USS=  8388 KB, heap=307308 KB, anonymous_mmaps=  5856 KB, total_mapped=307308 KB, count=  1>)
 ```

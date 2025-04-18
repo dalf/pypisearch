@@ -1,23 +1,25 @@
 import aiohttp
+import marisa_trie
 from lxml import html
-from rust_fst import Set
 
-PACKAGE_FILE = "packages.fst"
-PACKAGE_NAMES: Set | None = None
+MARISA_FILENAME = "packages.marisa"
+MARISA_TRIE: marisa_trie.Trie | None = None
 
 
 ## LOAD ###################################################
 
 
 def load_dataset():
-    global PACKAGE_NAMES
-    PACKAGE_NAMES = Set(path=PACKAGE_FILE)
+    global MARISA_TRIE
+    MARISA_TRIE = marisa_trie.Trie()
+    # MARISA_TRIE.load(PACKAGE_FILE)
+    MARISA_TRIE.mmap(MARISA_FILENAME)
 
 
-def get_dataset() -> Set:
-    if PACKAGE_NAMES is None:
+def get_dataset() -> marisa_trie.Trie:
+    if MARISA_TRIE is None:
         load_dataset()
-    return PACKAGE_NAMES
+    return MARISA_TRIE
 
 
 ## DOWNLOAD & WRITE #######################################
@@ -35,18 +37,20 @@ async def download_simple():
 
 
 def write_dataset(content: str):
-    global PACKAGE_NAMES
+    global MARISA_TRIE
     doc = html.fromstring(content)
     links = doc.xpath("//a")
     names = []
     for a in links:
-        # href = a.get("href")  # the URL (may be None)
-        text = a.text_content().strip()  # the visible text, with surrounding whitespace removed
+        text = a.text_content().strip()
         norm_text = normalize(text)
         names.append(norm_text)
 
     names = sorted(names)
-    PACKAGE_NAMES = Set.from_iter(names, PACKAGE_FILE)
+    MARISA_TRIE = marisa_trie.Trie(names)
+
+    # Save the trie to disk using pickle
+    MARISA_TRIE.save(MARISA_FILENAME)
 
 
 def normalize(text):

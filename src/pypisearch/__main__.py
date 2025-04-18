@@ -41,11 +41,11 @@ async def fetch_all(package_name_list: list[str]) -> dict[str, dict]:
 async def async_search(query: str):
     with measure("query"):
         norm_query = query.lower()
-        package_name_list = list(get_dataset().search_re(norm_query + ".*"))
-        if not package_name_list:
-            package_name_list = list(get_dataset().search(norm_query, 2))
-        if not package_name_list:
-            package_name_list = list(get_dataset().search_re(".*" + norm_query + ".*"))
+        package_name_list = list(get_dataset().keys(prefix=norm_query))
+        # if not package_name_list:
+        #     package_name_list = list(get_dataset().search(norm_query, 2))
+        # if not package_name_list:
+        #     package_name_list = list(get_dataset().search_re(".*" + norm_query + ".*"))
     details = await fetch_all(package_name_list)
     for package_name, detail in details.items():
         print(detail.get("info", {}).get("name", package_name))

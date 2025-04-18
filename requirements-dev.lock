@@ -24,7 +24,6 @@ brotli==1.1.0
     # via aiohttp
 cffi==1.17.1
     # via pycares
-    # via rust-fst
 click==8.1.8
     # via pypisearch
 frozenlist==1.6.0
@@ -33,6 +32,8 @@ frozenlist==1.6.0
 idna==3.10
     # via yarl
 lxml==5.3.2
+    # via pypisearch
+marisa-trie==1.2.1
     # via pypisearch
 multidict==6.4.3
     # via aiohttp
@@ -46,8 +47,8 @@ pycares==4.6.0
     # via aiodns
 pycparser==2.22
     # via cffi
-rust-fst==0.1.2
-    # via pypisearch
+setuptools==78.1.0
+    # via marisa-trie
 uvloop==0.21.0
     # via pypisearch
 yarl==1.20.0
