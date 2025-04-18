@@ -5,8 +5,7 @@ import click
 import uvloop
 
 from .dataset import download_dataset, get_dataset
-from .metrics import StopWatch
-from .utils import get_memory_uss
+from .metrics import get_measure, measure
 
 uvloop.install()
 
@@ -40,13 +39,13 @@ async def fetch_all(package_name_list: list[str]) -> dict[str, dict]:
 
 
 async def async_search(query: str):
-    norm_query = query.lower()
-
-    package_name_list = list(get_dataset().search_re(norm_query + ".*"))
-    if not package_name_list:
-        package_name_list = list(get_dataset().search(norm_query, 2))
-    if not package_name_list:
-        package_name_list = list(get_dataset().search_re(".*" + norm_query + ".*"))
+    with measure("query"):
+        norm_query = query.lower()
+        package_name_list = list(get_dataset().search_re(norm_query + ".*"))
+        if not package_name_list:
+            package_name_list = list(get_dataset().search(norm_query, 2))
+        if not package_name_list:
+            package_name_list = list(get_dataset().search_re(".*" + norm_query + ".*"))
     details = await fetch_all(package_name_list)
     for package_name, detail in details.items():
         print(detail.get("info", {}).get("name", package_name))
@@ -70,19 +69,16 @@ def download():
 @cli.command()
 @click.argument("text", type=str)
 def search(text: str):
-    sw = StopWatch()
-    with sw.measure("load"):
-        memory_before = get_memory_uss()
+    with measure("load"):
         get_dataset()
-        memory_after = get_memory_uss()
 
-    with sw.measure("query"):
+    with measure("search"):
         asyncio.run(async_search(text))
 
     print("--------------------")
-    print("cputime=", sw.get_cputime_dict())
-    print("runtime=", sw.get_runtime_dict())
-    print("memory usage for dataset =", memory_after - memory_before, "bytes")
+    print("Load  ", get_measure("load"))
+    print("Query ", get_measure("query"))
+    print("Search", get_measure("search"))
 
 
 if __name__ == "__main__":
