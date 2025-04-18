@@ -5,8 +5,7 @@ import click
 import uvloop
 
 from .index import download_index, get_index
-from .metrics import StopWatch
-from .utils import get_memory_uss, get_smaps_summary
+from .metrics import get_measure, measure
 
 uvloop.install()
 
@@ -53,7 +52,8 @@ def index_search(query: str) -> list[str]:
 
 
 async def async_search(query: str):
-    package_name_list = index_search(query)
+    with measure("query"):
+        package_name_list = index_search(query)
     details = await fetch_all(package_name_list)
     for package_name, detail in details.items():
         print(detail.get("info", {}).get("name", package_name))
@@ -77,23 +77,16 @@ def download():
 @cli.command()
 @click.argument("text", type=str)
 def search(text: str):
-    sw = StopWatch()
-    memory_before_detail = get_smaps_summary()
-    memory_before = get_memory_uss()
-    with sw.measure("load"):
+    with measure("load"):
         get_index()
 
-    with sw.measure("query"):
+    with measure("search"):
         asyncio.run(async_search(text))
-    memory_after = get_memory_uss()
-    memory_after_detail = get_smaps_summary()
 
     print("--------------------")
-    print("cputime=", sw.get_cputime_dict())
-    print("runtime=", sw.get_runtime_dict())
-    print("memory usage for loading the index =", memory_after - memory_before, "bytes")
-    memdiff = {k: v - memory_before_detail[k] for k, v in memory_after_detail.items()}
-    print("memory diff=", memdiff)
+    print("Load  ", get_measure("load"))
+    print("Query ", get_measure("query"))
+    print("Search", get_measure("search"))
 
 
 if __name__ == "__main__":

@@ -61,6 +61,6 @@ def write_index(content: str):
     idx = tv.Index(schema, path=INDEX_DIRECTORY)
     writer = idx.writer(128 << 20)
     for doc_id, name in enumerate(names):
-        writer.add_document(tv.Document(doc_id=doc_id, title=[name]))
+        writer.add_document(tv.Document(title=[name]))
     writer.commit()
     writer.wait_merging_threads()

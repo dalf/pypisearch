@@ -5,7 +5,7 @@ from typing import Dict
 
 
 @dataclass
-class Measure:
+class TimeMeasure:
     runtime: float = 0.0
     cputime: float = 0.0
     count: int = 0
@@ -15,10 +15,13 @@ class Measure:
         self.cputime += cputime
         self.count += 1
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__} runtime={self.runtime:2.4f} cputime={self.cputime:2.4f} count={self.count:4}>"
 
-class StopWatch:
+
+class TimeWatch:
     def __init__(self) -> None:
-        self.measures: Dict[str, Measure] = {}
+        self.measures: Dict[str, TimeMeasure] = {}
 
     @contextmanager
     def measure(self, name: str):
@@ -30,8 +33,11 @@ class StopWatch:
             runtime = perf_counter() - start_perf_counter
             cputime = process_time() - start_process_time
             if name not in self.measures:
-                self.measures[name] = Measure()
+                self.measures[name] = TimeMeasure()
             self.measures[name].add_measure(runtime, cputime)
+
+    def __getitem__(self, name):
+        return self.measures[name]
 
     def get_runtime_dict(self) -> Dict[str, float]:
         result = {name: rr.runtime for name, rr in self.measures.items()}
