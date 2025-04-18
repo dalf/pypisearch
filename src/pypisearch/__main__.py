@@ -39,7 +39,7 @@ async def fetch_all(package_name_list: list[str]) -> dict[str, dict]:
     return results
 
 
-async def async_query(query: str):
+async def async_search(query: str):
     norm_query = query.lower()
 
     package_name_list = list(get_dataset().search_re(norm_query + ".*"))
@@ -68,7 +68,7 @@ def download():
 
 @cli.command()
 @click.argument("text", type=str)
-def query(text: str):
+def search(text: str):
     sw = StopWatch()
     with sw.measure("load"):
         memory_before = get_memory_uss()
@@ -76,7 +76,7 @@ def query(text: str):
         memory_after = get_memory_uss()
 
     with sw.measure("query"):
-        asyncio.run(async_query(text))
+        asyncio.run(async_search(text))
 
     print("--------------------")
     print("cputime=", sw.get_cputime_dict())
