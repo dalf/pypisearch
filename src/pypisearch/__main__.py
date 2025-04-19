@@ -3,6 +3,7 @@ import asyncio
 import aiohttp
 import click
 import uvloop
+from whoosh.qparser import QueryParser
 
 from .index import download_index, get_index
 from .metrics import get_measure, measure
@@ -40,15 +41,10 @@ async def fetch_all(package_name_list: list[str]) -> dict[str, dict]:
 
 def index_search(query: str) -> list[str]:
     index = get_index()
-    searcher = index.searcher()
-    query = index.parse_query(
-        query,
-        [
-            "title",
-        ],
-    )
-    result = searcher.search(query, 15).hits
-    return [searcher.doc(r[1])["title"][0] for r in result]
+    with index.searcher() as searcher:
+        q = QueryParser("title", index.schema).parse(query)
+        results = searcher.search(q)
+        return [r["title"] for r in results]
 
 
 async def async_search(query: str):

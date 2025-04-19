@@ -1,22 +1,18 @@
 import aiohttp
-import tantivy as tv
+import whoosh
+import whoosh.index
+from whoosh.fields import *
 from lxml import html
 
 INDEX_DIRECTORY = "index"
-INDEX: tv.Index | None = None
+INDEX: whoosh.index.Index | None = None
 
 
 ## SCHEMA ###################################################
 
 
 def get_schema():
-    schema_builder = tv.SchemaBuilder()
-    tokenizer_name = "en_stem"  # "raw", "en_stem", "default"
-    # "raw": get only exact match - 22M
-    # "default": default tokenizer -
-    # "en_stem": English tokenizer - 19M
-    schema_builder.add_text_field("title", stored=True, tokenizer_name=tokenizer_name)
-    return schema_builder.build()
+    return Schema(title=TEXT(stored=True))
 
 
 ## LOAD #####################################################
@@ -24,10 +20,10 @@ def get_schema():
 
 def load_index():
     global INDEX
-    INDEX = tv.Index(get_schema(), path=INDEX_DIRECTORY)
+    INDEX = whoosh.index.open_dir(INDEX_DIRECTORY)
 
 
-def get_index() -> tv.Index:
+def get_index() -> whoosh.index.Index:
     if INDEX is None:
         load_index()
     return INDEX
@@ -56,11 +52,8 @@ def write_index(content: str):
         text = a.text_content().strip()  # the visible text, with surrounding whitespace removed
         names.append(text)
 
-    schema = get_schema()
-
-    idx = tv.Index(schema, path=INDEX_DIRECTORY)
-    writer = idx.writer(128 << 20)
+    ix = whoosh.index.create_in(INDEX_DIRECTORY, get_schema())
+    writer = ix.writer()
     for doc_id, name in enumerate(names):
-        writer.add_document(tv.Document(title=[name]))
+        writer.add_document(title=name)
     writer.commit()
-    writer.wait_merging_threads()

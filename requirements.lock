@@ -45,9 +45,9 @@ pycares==4.6.0
     # via aiodns
 pycparser==2.22
     # via cffi
-tantivy==0.22.2
-    # via pypisearch
 uvloop==0.21.0
+    # via pypisearch
+whoosh==2.7.4
     # via pypisearch
 yarl==1.20.0
     # via aiohttp
