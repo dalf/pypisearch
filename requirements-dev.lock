@@ -31,7 +31,7 @@ frozenlist==1.6.0
     # via aiosignal
 idna==3.10
     # via yarl
-lxml==5.3.2
+msgspec==0.19.0
     # via pypisearch
 multidict==6.4.3
     # via aiohttp
@@ -45,7 +45,11 @@ pycares==4.6.0
     # via aiodns
 pycparser==2.22
     # via cffi
+pyzstd==0.16.2
+    # via pypisearch
 tantivy==0.22.2
+    # via pypisearch
+tqdm==4.67.1
     # via pypisearch
 uvloop==0.21.0
     # via pypisearch

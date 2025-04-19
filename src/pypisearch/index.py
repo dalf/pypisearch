@@ -1,6 +1,8 @@
 import aiohttp
+import msgspec
+import pyzstd
 import tantivy as tv
-from lxml import html
+from tqdm import tqdm
 
 INDEX_DIRECTORY = "index"
 INDEX: tv.Index | None = None
@@ -16,6 +18,9 @@ def get_schema():
     # "default": default tokenizer -
     # "en_stem": English tokenizer - 19M
     schema_builder.add_text_field("title", stored=True, tokenizer_name=tokenizer_name)
+    schema_builder.add_text_field("summary", stored=True, tokenizer_name=tokenizer_name)
+    schema_builder.add_text_field("version", stored=True, tokenizer_name=tokenizer_name)
+    schema_builder.add_text_field("package_url", stored=True, tokenizer_name="raw")
     return schema_builder.build()
 
 
@@ -37,30 +42,43 @@ def get_index() -> tv.Index:
 
 
 async def download_index():
-    write_index(await download_simple())
+    write_index(await download_pypicache())
 
 
-async def download_simple():
-    async with aiohttp.ClientSession() as session, session.get("https://pypi.org/simple/") as response:
+async def download_pypicache():
+    async with aiohttp.ClientSession() as session, session.get("https://pypicache.repology.org/pypicache.json.zst") as response:
         print("Status:", response.status)
         print("Content-type:", response.headers["content-type"])
-        return await response.text()
+        return await response.read()
 
 
-def write_index(content: str):
-    doc = html.fromstring(content)
-    links = doc.xpath("//a")
-    names = []
-    for a in links:
-        # href = a.get("href")  # the URL (may be None)
-        text = a.text_content().strip()  # the visible text, with surrounding whitespace removed
-        names.append(text)
+class DumpInfo(msgspec.Struct):
+    name: str | None = None
+    summary: str | None = None
+    version: str | None = None
+    package_url: str | None = None
+
+
+class DumpEntry(msgspec.Struct):
+    info: DumpInfo
+
+
+def write_index(content: bytes):
+    uncompressed_content = pyzstd.decompress(content).decode()
+    entries = msgspec.json.decode(uncompressed_content, type=list[DumpEntry])
 
     schema = get_schema()
 
     idx = tv.Index(schema, path=INDEX_DIRECTORY)
     writer = idx.writer(128 << 20)
-    for doc_id, name in enumerate(names):
-        writer.add_document(tv.Document(title=[name]))
+    for entry in tqdm(entries):
+        writer.add_document(
+            tv.Document(
+                title=[entry.info.name or ""],
+                summary=[entry.info.summary or ""],
+                version=[entry.info.version or ""],
+                package_url=[entry.info.package_url or ""],
+            )
+        )
     writer.commit()
     writer.wait_merging_threads()
